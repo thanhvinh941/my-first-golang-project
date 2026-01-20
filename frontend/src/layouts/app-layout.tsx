@@ -8,12 +8,12 @@ export default function AppLayout() {
   return (
     
     <SidebarProvider defaultOpen={true}>
-      <div className="p-2">
+      <div className="p-2 w-full">
         <div className="flex gap-2">
           <AppSidebar />
-          <main className="flex-1">
+          <main className="flex-1 w-full">
             <SidebarTrigger />
-            <section className="p-4">
+            <section className="p-4 w-full">
               <Outlet />
             </section>
           </main>
