@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { SymbolInfoDto } from "./useSymbolStore";
 import axios from "axios";
+import type { FieldName, Operator, FilterRow as FilterRowType } from "./types";
 
 export interface WarrantDto {
     [key: string]: SymbolInfoDto;
@@ -24,7 +25,7 @@ export interface UseWarrantState {
     isLoading: boolean;
     error: string | null;
     fetchAllData: () => Promise<void>;
-    analysis: () => Promise<void>;
+    analysis: (filter?: FilterRowType[]) => Promise<void>;
 }
 
 export const UseWarrantStore = create<UseWarrantState>((set) => ({
@@ -45,10 +46,12 @@ export const UseWarrantStore = create<UseWarrantState>((set) => ({
             }
         }
     },
-    analysis: async () => {
+    analysis: async (filter?: FilterRowType[]) => {
         set({ isLoading: true, error: null });
         try {
-            var body = {
+            var body = filter ? {
+                filters: [filter]
+            } : {
                 symbols: [],
                 filters: [
                     [

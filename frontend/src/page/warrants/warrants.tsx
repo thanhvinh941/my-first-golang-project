@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UseWarrantStore } from "@/store/useWarrantStore";
 import { useEffect, useState } from "react";
 import { TooltipFilter } from "./components/tooltip-filter";
-
+import type { FieldName, Operator, FilterRow as FilterRowType } from "./types";
 export default function Warrant() {
     const {
         data,
@@ -21,8 +21,7 @@ export default function Warrant() {
 
     const keys: string[] = Object.keys(data!);
 
-    const [filterRows, setFilterRows] = useState<[]>([]);
-
+    const [filterRows, setFilterRows] = useState<FilterRowType[]>([]);
 
     return (
         <>
@@ -33,7 +32,11 @@ export default function Warrant() {
                         <TabsTrigger value="view">View</TabsTrigger>
                     </TabsList>
                     <TabsContent value="analysis" className="w-full overflow-auto">
-                        <TooltipFilter onApply={(rows) => setFilterRows(rows)} />
+                        <TooltipFilter onApply={(rows) => {
+                            setFilterRows(rows)
+                            console.log(filterRows)
+                            analysis(filterRows)
+                        }} />
 
                         <table className="w-full table-auto border-collapse text-sm">
                             <thead className="bg-gray-100">

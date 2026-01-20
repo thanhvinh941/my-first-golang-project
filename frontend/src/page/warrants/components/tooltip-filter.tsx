@@ -31,14 +31,14 @@ export const TooltipFilter: React.FC<Props> = ({ onApply }) => {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <button className="px-3 py-1 bg-blue-600 text-white rounded">
+                <button className="px-3 py-1  rounded">
                     Filter
                 </button>
             </TooltipTrigger>
 
             <TooltipContent
                 align="start"
-                className="w-96 p-4 bg-white border shadow-lg"
+                className="w-96 p-4 border shadow-lg"
             >
                 <div className="space-y-3">
                     {rows.map((row, i) => (
@@ -53,13 +53,13 @@ export const TooltipFilter: React.FC<Props> = ({ onApply }) => {
                     <div className="flex justify-between items-center pt-3 border-t">
                         <button
                             onClick={addRow}
-                            className="text-sm text-blue-600"
+                            className="text-sm"
                         >
                             + Add condition
                         </button>
                         <button
                             onClick={handleApply}
-                            className="bg-blue-600 text-white px-3 py-1 rounded"
+                            className=" px-3 py-1 rounded"
                         >
                             Apply
                         </button>
