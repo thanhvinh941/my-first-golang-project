@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { SymbolInfoDto } from "./useSymbolStore";
 import axios from "axios";
-import type { FieldName, Operator, FilterRow as FilterRowType } from "./types";
+import type { FilterRow } from "@/page/warrants/types";
 
 export interface WarrantDto {
     [key: string]: SymbolInfoDto;
@@ -25,7 +25,7 @@ export interface UseWarrantState {
     isLoading: boolean;
     error: string | null;
     fetchAllData: () => Promise<void>;
-    analysis: (filter?: FilterRowType[]) => Promise<void>;
+    analysis: (filter?: FilterRow[]) => Promise<void>;
 }
 
 export const UseWarrantStore = create<UseWarrantState>((set) => ({
@@ -46,49 +46,72 @@ export const UseWarrantStore = create<UseWarrantState>((set) => ({
             }
         }
     },
-    analysis: async (filter?: FilterRowType[]) => {
+    analysis: async (filter?: FilterRow[], sorts?: { field: string, direction: string }[]) => {
         set({ isLoading: true, error: null });
+        const rest: FilterRow[] = [];
         try {
-            var body = filter ? {
-                filters: [filter]
-            } : {
+            const symbols: string[] = [];
+
+            for (const f of filter!) {
+                if (f.field === "symbol") {
+                    // gom symbol
+                    if (Array.isArray(f.value)) {
+                        for (const v of f.value) {
+                            const parts = String(v).split(",").map(s => s.trim()).filter(Boolean);
+                            symbols.push(...parts);
+                        }
+                    } else if (f.value != null) {
+                        const parts = String(f.value).split(",").map(s => s.trim()).filter(Boolean);
+                        symbols.push(...parts);
+                    }
+                    // không push vào rest => loại bỏ filter symbol
+                } else {
+                    rest.push(f);
+                }
+            }
+
+            let defaultBody: { symbols: string[], filters: FilterRow[][], sorts: { field: string, direction: string }[] } = {
                 symbols: [],
                 filters: [
                     [
                         {
-                            "field": "breakevenIncreasePct",
-                            "operator": "LT",
-                            "value": 10,
-                            "valueTo": {}
+                            field: "breakevenIncreasePct",
+                            operator: "LT",
+                            value: '10',
                         },
                         {
-                            "field": "warrantPrice",
-                            "operator": "NE",
-                            "value": 0,
-                            "valueTo": {}
+                            field: "warrantPrice",
+                            operator: "NE",
+                            value: '0',
                         },
                         {
-                            "field": "timeToMaturity",
-                            "operator": "GT",
-                            "value": 0.27,
-                            "valueTo": {}
+                            field: "timeToMaturity",
+                            operator: "GT",
+                            value: '0.27',
                         },
-                        {
-                            "field": "analysisDate",
-                            "operator": "EQ",
-                            "value": "2026-01-20",
-                            "valueTo": {}
-                        }
-                    ]
+                    ],
                 ],
-                "sorts": [
+                sorts: [
                     {
-                        "field": "breakevenIncreasePct",
-                        "direction": "ASC"
-                    }
-                ]
+                        field: "breakevenIncreasePct",
+                        direction: "ASC",
+                    },
+                ],
+            };
+
+            if (rest) {
+                defaultBody = { ...defaultBody, filters: [rest] }
             }
-            const response = await axios.post<AnalysisDto[]>(`api/warrants/analysis`, body);
+
+            if (symbols) {
+                defaultBody = { ...defaultBody, symbols: symbols }
+            }
+
+            if(sorts) {
+                defaultBody = { ...defaultBody, sorts: sorts }
+            }
+
+            const response = await axios.post<AnalysisDto[]>(`api/warrants/analysis`, defaultBody);
             set({ analysisData: response.data, isLoading: false });
         } catch (err) {
             if (err instanceof Error) {
