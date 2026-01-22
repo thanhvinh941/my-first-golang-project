@@ -14,7 +14,8 @@ export type Field = {
     | "status"
     | "breakevenIncreasePct"
     | "breakevenPrice"
-    | "timeToMaturity";
+    | "timeToMaturity"
+    | "daysToMaturity";
     type: "string" | "number" | "date";
 };
 

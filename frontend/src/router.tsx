@@ -5,6 +5,7 @@ import AppLayout from "./layouts/app-layout";
 import Favourite from "./page/favourite/favourites";
 import Etf from "./page/etf/etf";
 import Warrant from "./page/warrants/warrants";
+import Moniter from "./page/moniter/page";
 
 export const router = createBrowserRouter([
   {
@@ -15,7 +16,8 @@ export const router = createBrowserRouter([
       { path: "symbol", element: <Symbol /> },
       { path: "favourites", element: <Favourite />},
       { path: "etf", element: <Etf />},
-      { path: "cw", element: <Warrant />}
+      { path: "cw", element: <Warrant />},
+      { path: "moniter", element: <Moniter />}
     ],
   },
 ]);

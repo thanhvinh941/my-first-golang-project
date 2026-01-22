@@ -26,6 +26,7 @@ export interface UseWarrantState {
     error: string | null;
     fetchAllData: () => Promise<void>;
     analysis: (filter?: FilterRow[]) => Promise<void>;
+    jobCall: () => Promise<void>;
 }
 
 export const UseWarrantStore = create<UseWarrantState>((set) => ({
@@ -113,6 +114,23 @@ export const UseWarrantStore = create<UseWarrantState>((set) => ({
 
             const response = await axios.post<AnalysisDto[]>(`api/warrants/analysis`, defaultBody);
             set({ analysisData: response.data, isLoading: false });
+        } catch (err) {
+            if (err instanceof Error) {
+                set({ error: err.message, isLoading: false });
+            } else {
+                set({ error: 'An unknown error occurred', isLoading: false });
+            }
+        }
+    },
+    jobCall: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            axios.get(`api/job/sync-data`);
+            setTimeout(() => {
+                console.log("wait to call sync-data")
+                            axios.get(`api/job/analysis-cw`);
+
+            }, 10000)
         } catch (err) {
             if (err instanceof Error) {
                 set({ error: err.message, isLoading: false });

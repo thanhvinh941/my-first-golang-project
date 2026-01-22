@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BadgeDollarSign, BadgePercent, Home, Inbox, Star } from "lucide-react";
+import { BadgeDollarSign, BadgePercent, Home, Inbox, MonitorCogIcon, Star } from "lucide-react";
 import { NavLink } from "react-router-dom"; // hoặc Link nếu không cần active state
 
 const items = [
@@ -19,6 +19,7 @@ const items = [
   { title: "Favourites", to: "/favourites",  icon: Star },
   { title: "ETF",   to: "/etf",    icon: BadgeDollarSign },
   { title: "Warrant", to: "/cw",  icon: BadgePercent },
+  { title: "Moniter", to: "/moniter",  icon: MonitorCogIcon },
 ];
 
 export function AppSidebar() {
