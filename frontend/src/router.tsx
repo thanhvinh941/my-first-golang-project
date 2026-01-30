@@ -1,23 +1,80 @@
+import { Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import Home from "./page/home/home";
-import Symbol from "./page/symbol/symbol";
 import AppLayout from "./layouts/app-layout";
-import Favourite from "./page/favourite/favourites";
-import Etf from "./page/etf/etf";
-import Warrant from "./page/warrants/warrants";
-import Moniter from "./page/moniter/page";
+import { Loader2 } from "lucide-react";
+import { lazyWithDelay } from "./store/utils/lazy-with-delay";
+
+const Home = lazyWithDelay(() => import("./page/home/home"));
+const Symbol = lazyWithDelay(() => import("./page/symbol/symbol"));
+const Favourite = lazyWithDelay(() => import("./page/favourite/favourites"));
+const Etf = lazyWithDelay(() => import("./page/etf/etf"));
+const Warrant = lazyWithDelay(() => import("./page/warrants/warrants"));
+const Moniter = lazyWithDelay(() => import("./page/moniter/page"));
+
+
+export default function AppLoading() {
+  console.log("AppLoading....")
+  return (
+    <div className="flex h-screen w-full items-center justify-center">
+      <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout/>,
+    element: <AppLayout />,
     children: [
-      { index: true, element: <Home /> },
-      { path: "symbol", element: <Symbol /> },
-      { path: "favourites", element: <Favourite />},
-      { path: "etf", element: <Etf />},
-      { path: "cw", element: <Warrant />},
-      { path: "moniter", element: <Moniter />}
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<AppLoading />}>
+            <Home />
+          </Suspense>
+        ),
+      },
+      {
+        path: "symbol",
+        element: (
+          <Suspense fallback={<AppLoading />}>
+            <Symbol />
+          </Suspense>
+        ),
+      },
+      {
+        path: "favourites",
+        element: (
+          <Suspense fallback={<AppLoading />}>
+            <Favourite />
+          </Suspense>
+        ),
+      },
+      {
+        path: "etf",
+        element: (
+          <Suspense fallback={<AppLoading />}>
+            <Etf />
+          </Suspense>
+        ),
+      },
+      {
+        path: "cw",
+        element: (
+          <Suspense fallback={<AppLoading />}>
+            <Warrant />
+          </Suspense>
+        ),
+      },
+      {
+        path: "moniter",
+        element: (
+          <Suspense fallback={<AppLoading />}>
+            <Moniter />
+          </Suspense>
+        ),
+      },
     ],
   },
 ]);
+

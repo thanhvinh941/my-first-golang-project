@@ -108,7 +108,7 @@ export const UseWarrantStore = create<UseWarrantState>((set) => ({
                 defaultBody = { ...defaultBody, symbols: symbols }
             }
 
-            if(sorts) {
+            if (sorts) {
                 defaultBody = { ...defaultBody, sorts: sorts }
             }
 
@@ -125,12 +125,13 @@ export const UseWarrantStore = create<UseWarrantState>((set) => ({
     jobCall: async () => {
         set({ isLoading: true, error: null });
         try {
-            axios.get(`api/job/sync-data`);
-            setTimeout(() => {
-                console.log("wait to call sync-data")
-                            axios.get(`api/job/analysis-cw`);
+            const isRealtime = isRealtimeNow();
+            axios.get(`api/job/analysis-cw`,
+                {
+                    params: { isRealtime },
+                }
+            );
 
-            }, 10000)
         } catch (err) {
             if (err instanceof Error) {
                 set({ error: err.message, isLoading: false });
@@ -140,3 +141,42 @@ export const UseWarrantStore = create<UseWarrantState>((set) => ({
         }
     },
 }))
+
+
+// Helper: Lấy thời gian hiện tại theo múi giờ Asia/Ho_Chi_Minh
+const nowInTimeZone = (timeZone = 'Asia/Ho_Chi_Minh'): Date => {
+    // Tạo một Date theo tz bằng cách parse chuỗi giờ local của tz (tránh phụ thuộc môi trường)
+    const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+    })
+        .formatToParts(new Date())
+        .reduce<Record<string, string>>((acc, p) => {
+            if (p.type !== 'literal') acc[p.type] = p.value;
+            return acc;
+        }, {});
+
+    // parts: { year:'2026', month:'01', day:'26', hour:'16', minute:'47', second:'58' }
+    return new Date(
+        Number(parts.year),
+        Number(parts.month) - 1,
+        Number(parts.day),
+        Number(parts.hour),
+        Number(parts.minute),
+        Number(parts.second),
+    );
+};
+
+// Helper: kiểm tra khung giờ 09:00 → 15:00 (không tính 15:00 trở đi)
+const isRealtimeNow = (d = nowInTimeZone()): boolean => {
+    const minutes = d.getHours() * 60 + d.getMinutes();
+    const start = 9 * 60;   // 09:00
+    const end = 15 * 60;    // 15:00
+    return minutes >= start && minutes < end;
+};

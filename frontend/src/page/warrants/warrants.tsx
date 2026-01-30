@@ -1,30 +1,29 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UseWarrantStore } from "@/store/useWarrantStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { TooltipFilter } from "./components/tooltip-filter";
-import type { FieldName, Operator, FilterRow as FilterRowType } from "./types";
 import { Button } from "@/components/ui/button";
+import { useLoadingStore } from "@/store/useLoadingStore";
+
 export default function Warrant() {
     const {
         data,
         analysisData,
-        isLoading,
-        error,
         fetchAllData,
         analysis,
         jobCall
     } = UseWarrantStore();
+    const setPageLoading = useLoadingStore((s) => s.setPageLoading);
 
     useEffect(() => {
+        setPageLoading(true)
         fetchAllData()
         analysis()
-
+        setPageLoading(false)
     }, [])
 
     const keys: string[] = Object.keys(data!);
-
-    const [filterRows, setFilterRows] = useState<FilterRowType[]>([]);
 
     return (
         <>
@@ -40,9 +39,7 @@ export default function Warrant() {
 
                     <TabsContent value="analysis" className="w-full overflow-auto">
                         <TooltipFilter onApply={(rows) => {
-                            setFilterRows(rows)
-                            console.log(filterRows)
-                            analysis(filterRows)
+                            analysis(rows)
                         }} />
 
                         <table className="w-full table-auto border-collapse text-sm">
@@ -129,8 +126,6 @@ export default function Warrant() {
                     </TabsContent>
                 </Tabs>
             </div>
-
-
         </>
 
     );
